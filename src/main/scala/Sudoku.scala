@@ -9,10 +9,10 @@ object Sudoku extends App {
     List(7, 6, 8, x, 2, 4, 5, 3)
   ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
 
-  val ps = List(1, 2, 3, 4, 5, 6, 7, 8).permutations.toList
-  println(ps.size)
+  val permutations = List(1, 2, 3, 4, 5, 6, 7, 8).permutations.toList
+  println(permutations.size)
 
-  val solution = SolveWithBackTrack(table, ps, soFarSoGood)
+  val solution = SolveWithBackTrack(table, permutations, soFarSoGood)
 
   print(solution.mkString("\n"))
 
