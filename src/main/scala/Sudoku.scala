@@ -7,8 +7,8 @@ object Sudoku extends App {
     //    List(x, x, 5, 6),
     //  List(x, 5, 7, 8),
     //List(1, 4, 9, 7)
-    List(9, x, 4, 5, 6, 7, 1),
-    List(x, 9, 8, 1, 3, 6, 5, 2, 7),
+    List(9, 8, x, x, 4, 5, 6, 7, 1),
+    List(x,9,  8, 1, 3, 6, 5, 2, 7),
     List(3, 7, 6, 8, x, 2, 4, 5, x)
   ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
 
@@ -35,7 +35,7 @@ object Sudoku extends App {
   def rowAndColumnOk(table: Table, solution: List[Int]): Boolean = {
     var solutionList = solution
     val emptySet: Set[Int] = Set.empty
-    var coluns = mutable.MutableList(table.cells.head.map(e => emptySet): _*)
+    val coluns = mutable.MutableList(table.cells.head.map(e => emptySet): _*)
     for (r <- table.cells.indices) {
       var row: Set[Int] = Set.empty
       for (c <- table.cells.head.indices) {
