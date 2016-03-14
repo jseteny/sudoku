@@ -6,7 +6,7 @@ object Sudoku extends App {
   val t = List(
     //    List(x, x, 5, 6),
     //  List(x, 5, 7, 8),
-    //List(1, 4, 9, 7)
+    // List(1, 4, 9, 7)
     List(9, 8, x, x, 4, 5, 6, 7, 1),
     List(x, 9, 8, 1, 3, 6, 5, 2, 7),
     List(3, 7, 6, 8, x, 2, 4, 5, x)
