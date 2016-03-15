@@ -4,25 +4,70 @@ object Sudoku extends App {
 
   val x = null
   val t = List(
-    //    List(x, x, 5, 6),
-    //  List(x, 5, 7, 8),
-    // List(1, 4, 9, 7)
-    List(9, 8, x, x, 4, 5, 6, 7, 1),
-    List(x, 9, 8, 1, 3, 6, 5, 2, 7),
-    List(3, 7, 6, 8, x, 2, 4, 5, x)
+    List(x, x, 5),
+    List(x, 6, 7),
+    List(1, 4, 9)
   ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
 
-  val table = Table(t)
+  val websudoku_com_hard = List(
+    //  (1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+    List(x, x, x, x, x, x, 8, x, x),
+    List(9, x, x, 6, 8, x, x, 1, 4),
+    List(x, 5, x, 7, x, x, 2, x, x),
+
+    List(x, x, x, 8, x, x, 6, x, 2),
+    List(7, x, x, 1, x, 4, x, x, 3),
+    List(2, x, 4, x, x, 6, x, x, x),
+
+    List(x, x, 9, x, x, 8, x, 5, x),
+    List(8, 6, x, x, 4, 3, x, x, 7),
+    List(x, x, 5, x, x, x, x, x, x)
+  ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
+
+
+  // http://www.websudoku.com/?level=4&set_id=9612062736
+  val websudoku_com_evil = List(
+    //  (1, 2, 3, 4, 5, 6, 7, 8, 9)
+
+    List(x, 9, x, x, x, 3, x, 7, 2),
+    List(x, x, x, x, 9, 4, x, 6, x),
+    List(x, x, x, 5, x, x, x, x, x),
+
+    List(x, x, 4, x, x, x, x, 1, 6),
+    List(7, x, 8, x, x, x, 5, x, 9),
+    List(1, 2, x, x, x, x, 3, x, x),
+
+    List(x, x, x, x, x, 7, x, x, x),
+    List(x, 4, x, 9, 1, x, x, x, x),
+    List(2, 6, x, 4, x, x, x, 9, x)
+  ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
+
+  val table = Table(websudoku_com_evil)
 
   val solution = SolveWithBackTrack(table, soFarSoGood)
 
-  print(s"solution:\n${solution.mkString("\n")}")
+  print(s"\nsolution:\n${merge(table, solution).cells.map(_.map(_.get)).mkString("\n")}\n")
 
   def soFarSoGood(table: Table, solution: List[Int]): Boolean = {
 
-    if (rowAndColumnOk(merge(table, solution))) {
-      println(solution.mkString("\n"))
-      println()
+    val merged: Table = merge(table, solution)
+
+    if (rowAndColumnOk(merged) &&
+      threeByThreeCellOk(merged, 0 to 2, 0 to 2) &&
+      threeByThreeCellOk(merged, 0 to 2, 3 to 5) &&
+      threeByThreeCellOk(merged, 0 to 2, 6 to 8) &&
+
+      threeByThreeCellOk(merged, 3 to 5, 0 to 2) &&
+      threeByThreeCellOk(merged, 3 to 5, 3 to 5) &&
+      threeByThreeCellOk(merged, 3 to 5, 6 to 8) &&
+
+      threeByThreeCellOk(merged, 6 to 8, 0 to 2) &&
+      threeByThreeCellOk(merged, 6 to 8, 3 to 5) &&
+      threeByThreeCellOk(merged, 6 to 8, 6 to 8)) {
+
+      //      println(solution.mkString("\n"))
+      print(".")
 
       true
 
@@ -51,14 +96,38 @@ object Sudoku extends App {
     Table(cells)
   }
 
+
+  def threeByThreeCellOk(table: Table, rows: Range, columns: Range): Boolean = {
+    var cell: Set[Int] = Set.empty
+    for (r <- rows) {
+      for (c <- columns) {
+        table.cells(r)(c) match {
+
+          case Some(n: Int) =>
+            if (cell.contains(n)) {
+              return false
+            } else {
+              cell += n
+            }
+
+          case None =>
+          // no solution yet for the given cell
+        }
+      }
+    }
+
+    //noinspection RemoveRedundantReturn
+    return true // all the cells has good solution
+  }
+
+
   def rowAndColumnOk(table: Table): Boolean = {
     val emptySet: Set[Int] = Set.empty
     val coluns = mutable.MutableList(table.cells.head.map(e => emptySet): _*)
     for (r <- table.cells.indices) {
       var row: Set[Int] = Set.empty
       for (c <- table.cells.head.indices) {
-        val element = table.cells(r)(c)
-        element match {
+        table.cells(r)(c) match {
 
           case Some(n: Int) =>
             if (row.contains(n) || coluns(c).contains(n)) {
