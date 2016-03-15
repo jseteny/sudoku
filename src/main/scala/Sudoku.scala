@@ -3,6 +3,7 @@ import scala.collection.mutable
 object Sudoku extends App {
 
   val x = null
+
   val t = List(
     List(x, x, 5),
     List(x, 6, 7),
@@ -43,9 +44,14 @@ object Sudoku extends App {
     List(2, 6, x, 4, x, x, x, 9, x)
   ).map(_.map(e => if (e == null) None else Option(e.asInstanceOf[Int])))
 
+  case class Table(cells: List[List[Option[Int]]]) {
+
+    def emptyCellCount: Int = cells.map(_.count(_.isEmpty)).sum
+  }
+
   val table = Table(websudoku_com_evil)
 
-  val solution = SolveWithBackTrack(table, soFarSoGood)
+  val solution = SolveWithBackTrack(table, soFarSoGood, finished = (t: Table, solution) => t.emptyCellCount == solution.size, 1, 9)
 
   print(s"\nsolution:\n${merge(table, solution).cells.map(_.map(_.get)).mkString("\n")}\n")
 
@@ -66,9 +72,7 @@ object Sudoku extends App {
       threeByThreeCellOk(merged, 6 to 8, 3 to 5) &&
       threeByThreeCellOk(merged, 6 to 8, 6 to 8)) {
 
-      //      println(solution.mkString("\n"))
       print(".")
-
       true
 
     } else {
@@ -76,6 +80,7 @@ object Sudoku extends App {
       false
     }
   }
+
 
   def merge(table: Table, solution: List[Int]): Table = {
     var solutionList = solution
@@ -98,16 +103,16 @@ object Sudoku extends App {
 
 
   def threeByThreeCellOk(table: Table, rows: Range, columns: Range): Boolean = {
-    var cell: Set[Int] = Set.empty
+    var cells: Set[Int] = Set.empty
     for (r <- rows) {
       for (c <- columns) {
         table.cells(r)(c) match {
 
           case Some(n: Int) =>
-            if (cell.contains(n)) {
+            if (cells.contains(n)) {
               return false
             } else {
-              cell += n
+              cells += n
             }
 
           case None =>
