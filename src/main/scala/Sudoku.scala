@@ -20,7 +20,7 @@ object Sudoku extends App {
 
   def soFarSoGood(table: Table, solution: List[Int]): Boolean = {
 
-    if (rowAndColumnOk(table, solution)) {
+    if (rowAndColumnOk(merge(table, solution))) {
       println(solution.mkString("\n"))
       println()
 
@@ -32,17 +32,35 @@ object Sudoku extends App {
     }
   }
 
-  def rowAndColumnOk(table: Table, solution: List[Int]): Boolean = {
+  def merge(table: Table, solution: List[Int]): Table = {
     var solutionList = solution
+
+    val cells = table.cells.map(row => row.map { element => (element, solutionList) match {
+      case (Some(n), _) =>
+        Some(n)
+
+      case (_, Nil) =>
+        None // no solution yet for the given cell
+
+      case (_, head :: tail) =>
+        solutionList = tail
+        Some(head)
+    }
+    })
+
+    Table(cells)
+  }
+
+  def rowAndColumnOk(table: Table): Boolean = {
     val emptySet: Set[Int] = Set.empty
     val coluns = mutable.MutableList(table.cells.head.map(e => emptySet): _*)
     for (r <- table.cells.indices) {
       var row: Set[Int] = Set.empty
       for (c <- table.cells.head.indices) {
         val element = table.cells(r)(c)
-        (element, solutionList) match {
+        element match {
 
-          case (Some(n: Int), _) =>
+          case Some(n: Int) =>
             if (row.contains(n) || coluns(c).contains(n)) {
               return false
             } else {
@@ -50,17 +68,8 @@ object Sudoku extends App {
               coluns(c) += n
             }
 
-          case (_, Nil) =>
-            return true // no solution yet for the given cell
-
-          case (_, head :: tail) =>
-            if (row.contains(head) || coluns(c).contains(head)) {
-              return false
-            } else {
-              row += head
-              coluns(c) += head
-              solutionList = tail
-            }
+          case None =>
+          // no solution yet for the given cell
         }
       }
     }
