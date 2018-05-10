@@ -148,7 +148,6 @@ object Sudoku extends App {
       }
     }
 
-    //noinspection RemoveRedundantReturn
-    return true // all the cells has good solution
+    true // all the cells has good solution
   }
 }
