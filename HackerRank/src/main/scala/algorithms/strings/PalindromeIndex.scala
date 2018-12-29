@@ -8,19 +8,22 @@ object Solution {
 
   // Complete the palindromeIndex function below.
   def palindromeIndex(s: String): Int = {
-    if (isPalindrome(s.toBuffer)) -1
-    else (0 until s.length).find(i => pIndex(s, i)).getOrElse(-1)
+    if (isPalindrome(s)) -1
+    else (0 until s.length).find(i => isPalindrome(s, Some(i))).getOrElse(-1)
   }
 
-  def pIndex(s: String, index: Int): Boolean = {
-    val newS = s.toBuffer
-    newS.remove(index)
-    isPalindrome(newS)
-  }
+  def isPalindrome(s: String, index: Option[Int] = None): Boolean = {
+    val len = if (index.isDefined) s.length - 1
+    else s.length
 
-  def isPalindrome(s: mutable.Buffer[Char]): Boolean = {
-    val len = s.length
-    (0 until len / 2).forall(i => s(i) == s(len - 1 - i))
+    if (index.isEmpty)
+      (0 until len / 2).forall { i => s(i) == s(len - 1 - i) }
+
+    else
+
+      (0 until len / 2).forall { i =>
+        if (i < index.getOrElse()) s(i) == s(len - 1 - i)
+      }
   }
 
   def main(args: Array[String]) {
